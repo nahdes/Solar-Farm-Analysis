@@ -43,9 +43,9 @@ st.markdown("""
 @st.cache_data
 def load_data():
     file_paths = {
-        'Benin': 'data/benin.csv',
-        'Sierra Leone': 'data/sierraleone.csv',
-        'Togo': 'data/togo.csv'
+        'Benin': 'Data/benin.csv',
+        'Sierra Leone': 'Data/sierraleone.csv',
+        'Togo': 'Data/togo.csv'
     }
     countries = {}
     for country, path in file_paths.items():
