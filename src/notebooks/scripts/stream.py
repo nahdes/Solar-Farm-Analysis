@@ -9,6 +9,8 @@ import warnings
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import os
+import pathlib
 warnings.filterwarnings('ignore')
 
 # Set page config
@@ -42,29 +44,32 @@ st.markdown("""
 # Load cleaned data (assuming CSV files are in a 'data' folder)
 @st.cache_data
 def load_data():
+    # Get the directory where this script (stream.py) is located
+    script_dir = pathlib.Path(__file__).parent.resolve()
+    data_dir = script_dir / "data1"
+
     file_paths = {
-        'Benin': 'src/notebooks/data1/benin.csv',
-        'Sierra Leone': 'src/notebooks/data1/sierraleone.csv',
-        'Togo': 'src/notebooks/data1/togo.csv'
+        'Benin': data_dir / 'benin.csv',
+        'Sierra Leone': data_dir / 'sierraleone.csv',
+        'Togo': data_dir / 'togo.csv'
     }
     countries = {}
     for country, path in file_paths.items():
         try:
-            df = pd.read_csv(path)
+            # Convert Path object to string for pandas
+            df = pd.read_csv(str(path))
             df['Country'] = country
-            # Parse timestamp
             df['Timestamp'] = pd.to_datetime(df['Timestamp'])
             countries[country] = df
             st.info(f"✓ Loaded {country}: {df.shape[0]} records")
         except Exception as e:
-            st.error(f"✗ Error loading {country}: {e}")
+            st.error(f"✗ Error loading {country} from {path}: {e}")
     
     if countries:
         comparison_df = pd.concat(countries.values(), ignore_index=True)
         comparison_df['Timestamp'] = pd.to_datetime(comparison_df['Timestamp'])
         return comparison_df, countries
     return None, {}
-
 # Fixed CrossCountryAnalyzer class (with error fix)
 class CrossCountryAnalyzer:
     def __init__(self, df):
